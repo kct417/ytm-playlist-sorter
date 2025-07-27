@@ -5,17 +5,20 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 
-from util.ytm_log import setup_logger
+from ytm_util.ytm_log import setup_logger
 
-SCOPES = ["https://www.googleapis.com/auth/youtube"]
+SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 TOKEN_FILE = "credentials/token.json"
 CLIENT_SECRETS_FILE = "credentials/client_secret.json"
 
 logger = setup_logger(__name__)
 
 
-# Authenticate and return a YouTube service object
 def authenticate_youtube():
+    """
+    Authenticate the user and return a YouTube service object.
+    """
+
     creds = None
     try:
         if os.path.exists(TOKEN_FILE):

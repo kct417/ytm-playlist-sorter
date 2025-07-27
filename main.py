@@ -1,19 +1,13 @@
 import logging
-from util.ytm_log import setup_logger
-from util.ytm_auth import authenticate_youtube
-from util.ytm_sort import display_items, get_playlists, sort_all_playlists
+from ytm_util.ytm_log import setup_logger, set_third_party_logging_level
+from ytm_util.ytm_auth import authenticate_youtube
+from ytm_util.ytm_sort import get_playlists, sort_all_playlists
 
 # -------------------- Logging Setup --------------------
-LOG_FILE = "ytm-sorter.log"
-logger = setup_logger(__name__, log_file=LOG_FILE)
-modules = {"util"}
+logger = setup_logger(__name__, disable_console=True)
+modules = {__name__, "ytm_util"}
 
-for name in logging.root.manager.loggerDict:
-    # Keep logs for __name__ and any module in 'modules' or submodules
-    if name != __name__ and not any(
-        name == mod or name.startswith(mod + ".") for mod in modules
-    ):
-        setup_logger(name, level=logging.ERROR)
+set_third_party_logging_level(modules)
 # -------------------------------------------------------
 
 
