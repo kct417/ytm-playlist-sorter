@@ -18,7 +18,6 @@ def authenticate_youtube():
     """
     Authenticate the user and return a YouTube service object.
     """
-
     creds = None
     try:
         if os.path.exists(TOKEN_FILE):
@@ -26,14 +25,27 @@ def authenticate_youtube():
 
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    # Handle invalid_grant or revoked refresh token
+                    if "invalid_grant" in str(e):
+                        logger.warning(
+                            "Token invalid or revoked, removing old token..."
+                        )
+                        os.remove(TOKEN_FILE)
+                        return authenticate_youtube()
+                    else:
+                        raise
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(
                     CLIENT_SECRETS_FILE, SCOPES
                 )
                 creds = flow.run_local_server(port=0)
+
             with open(TOKEN_FILE, "w") as token:
                 token.write(creds.to_json())
+
     except Exception as e:
         logger.error(f"Authentication failed: {e}")
         raise
